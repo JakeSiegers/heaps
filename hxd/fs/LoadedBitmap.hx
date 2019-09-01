@@ -1,6 +1,6 @@
 package hxd.fs;
 
-#if (flash || openfl)
+#if (flash || (openfl && !heaps_noOpenFl))
 typedef LoadedBitmapData = flash.display.BitmapData;
 #elseif lime
 typedef LoadedBitmapData = lime.graphics.Image;
@@ -17,7 +17,7 @@ abstract LoadedBitmap(LoadedBitmapData) {
 	}
 
 	public function toBitmap() : hxd.BitmapData {
-		#if (flash || openfl)
+		#if (flash || (openfl && !heaps_noOpenFl))
 		return hxd.BitmapData.fromNative(this);
 		#elseif lime
 		var bmp = new hxd.BitmapData(this.width, this.height);

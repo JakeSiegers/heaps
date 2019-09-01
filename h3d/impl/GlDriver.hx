@@ -673,7 +673,7 @@ class GlDriver extends Driver {
 			var cop = Pass.getBlendOp(bits);
 			var aop = Pass.getBlendAlphaOp(bits);
 			if( cop == aop ) {
-				#if (nme || openfl)
+				#if (nme || (openfl && !heaps_noOpenFl))
 				if( OP[cop] != GL.FUNC_ADD )
 					throw "blendEquation() disable atm (crash)";
 				#else
@@ -1371,7 +1371,7 @@ class GlDriver extends Driver {
 	}
 
 	override function isDisposed() {
-		#if (nme || openfl) //lime ??
+		#if (nme || (openfl && !heaps_noOpenFl)) //lime ??
 		return false;
 		#else
 		return gl.isContextLost();

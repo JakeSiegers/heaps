@@ -7,7 +7,7 @@ import haxe.io.Bytes;
  */
 class ByteConversions{
 
-#if (flash || openfl)
+#if (flash || (openfl && !heaps_noOpenFl))
 
 	public static function byteArrayToBytes( v: flash.utils.ByteArray ) : haxe.io.Bytes {
 		return
@@ -20,7 +20,7 @@ class ByteConversions{
 				b.set(i,v[i]);
 			b;
 		};
-		#elseif (openfl)
+		#elseif (openfl && !heaps_noOpenFl)
 		v;
 		#else
 		throw "unsupported on this platform";
@@ -30,7 +30,7 @@ class ByteConversions{
 	public static function bytesToByteArray( v: haxe.io.Bytes ) :  flash.utils.ByteArray {
 		#if flash
 		return v.getData();
-		#elseif openfl
+		#elseif (openfl && !heaps_noOpenFl)
 		return flash.utils.ByteArray.fromBytes(v);
 		#else
 		throw "unsupported on this platform";

@@ -1,7 +1,7 @@
 package hxd;
 
 typedef BitmapInnerData =
-#if (flash || openfl || nme)
+#if (flash || (openfl && !heaps_noOpenFl) || nme)
 	flash.display.BitmapData;
 #elseif js
 	js.html.CanvasRenderingContext2D;
@@ -25,13 +25,13 @@ class BitmapInnerDataImpl {
 
 class BitmapData {
 
-	#if (flash || nme || openfl)
+	#if (flash || nme || (openfl && !heaps_noOpenFl))
 	static var tmpRect = new flash.geom.Rectangle();
 	static var tmpPoint = new flash.geom.Point();
 	static var tmpMatrix = new flash.geom.Matrix();
 	#end
 
-#if (flash||openfl||nme)
+#if (flash||(openfl && !heaps_noOpenFl)||nme)
 	var bmp : flash.display.BitmapData;
 #elseif js
 	var ctx : js.html.CanvasRenderingContext2D;
@@ -48,7 +48,7 @@ class BitmapData {
 		if( width == -101 && height == -102 ) {
 			// no alloc
 		} else {
-			#if (flash||openfl||nme)
+			#if (flash||(openfl && !heaps_noOpenFl)||nme)
 			bmp = new flash.display.BitmapData(width, height, true, 0);
 			#elseif js
 			var canvas = js.Browser.document.createCanvasElement();
@@ -72,7 +72,7 @@ class BitmapData {
 	}
 
 	public function clear( color : Int ) {
-		#if (flash||openfl||nme)
+		#if (flash||(openfl && !heaps_noOpenFl)||nme)
 		bmp.fillRect(bmp.rect, color);
 		#else
 		fill(0, 0, width, height, color);
@@ -84,7 +84,7 @@ class BitmapData {
 	}
 
 	public function fill( x : Int, y : Int, width : Int, height : Int, color : Int ) {
-		#if (flash || openfl || nme)
+		#if (flash || (openfl && !heaps_noOpenFl) || nme)
 		var r = tmpRect;
 		r.x = x;
 		r.y = y;
@@ -120,7 +120,7 @@ class BitmapData {
 	}
 
 	public function draw( x : Int, y : Int, src : BitmapData, srcX : Int, srcY : Int, width : Int, height : Int, ?blendMode : h2d.BlendMode ) {
-		#if (flash || openfl || nme)
+		#if (flash || (openfl && !heaps_noOpenFl) || nme)
 		if( blendMode == null ) blendMode = Alpha;
 		var r = tmpRect;
 		r.x = srcX;
@@ -176,7 +176,7 @@ class BitmapData {
 
 	public function drawScaled( x : Int, y : Int, width : Int, height : Int, src : BitmapData, srcX : Int, srcY : Int, srcWidth : Int, srcHeight : Int, ?blendMode : h2d.BlendMode, smooth = true ) {
 		if( blendMode == null ) blendMode = Alpha;
-		#if (flash || openfl || nme)
+		#if (flash || (openfl && !heaps_noOpenFl) || nme)
 
 		var b = switch( blendMode ) {
 		case None:
@@ -467,7 +467,7 @@ class BitmapData {
 	}
 
 	public inline function dispose() {
-		#if (flash||openfl||nme)
+		#if (flash||(openfl && !heaps_noOpenFl)||nme)
 		bmp.dispose();
 		#elseif js
 		ctx = null;
@@ -482,7 +482,7 @@ class BitmapData {
 	}
 
 	public function sub( x, y, w, h ) : BitmapData {
-		#if (flash || openfl || nme)
+		#if (flash || (openfl && !heaps_noOpenFl) || nme)
 		var b = new flash.display.BitmapData(w, h);
 		b.copyPixels(bmp, new flash.geom.Rectangle(x, y, w, h), new flash.geom.Point(0, 0));
 		return fromNative(b);
@@ -543,8 +543,8 @@ class BitmapData {
 	/**
 		Access the pixel color value at the given position. Note : this function can be very slow if done many times and the BitmapData has not been locked.
 	**/
-	public #if (flash || openfl || nme) inline #end function getPixel( x : Int, y : Int ) : Int {
-		#if ( flash || openfl || nme )
+	public #if (flash || (openfl && !heaps_noOpenFl) || nme) inline #end function getPixel( x : Int, y : Int ) : Int {
+		#if ( flash || (openfl && !heaps_noOpenFl) || nme )
 		return bmp.getPixel32(x, y);
 		#elseif js
 		var i = lockImage;
@@ -566,8 +566,8 @@ class BitmapData {
 	/**
 		Modify the pixel color value at the given position. Note : this function can be very slow if done many times and the BitmapData has not been locked.
 	**/
-	public #if (flash || openfl || nme) inline #end function setPixel( x : Int, y : Int, c : Int ) {
-		#if ( flash || openfl || nme)
+	public #if (flash || (openfl && !heaps_noOpenFl) || nme) inline #end function setPixel( x : Int, y : Int, c : Int ) {
+		#if ( flash || (openfl && !heaps_noOpenFl) || nme)
 		bmp.setPixel32(x, y, c);
 		#elseif js
 		var i : js.html.ImageData = lockImage;
@@ -597,7 +597,7 @@ class BitmapData {
 	}
 
 	inline function get_width() : Int {
-		#if (flash || nme || openfl)
+		#if (flash || nme || (openfl && !heaps_noOpenFl))
 		return bmp.width;
 		#elseif js
 		return ctx.canvas.width;
@@ -607,7 +607,7 @@ class BitmapData {
 	}
 
 	inline function get_height() {
-		#if (flash || nme || openfl)
+		#if (flash || nme || (openfl && !heaps_noOpenFl))
 		return bmp.height;
 		#elseif js
 		return ctx.canvas.height;
@@ -617,7 +617,7 @@ class BitmapData {
 	}
 
 	public function getPixels() : Pixels {
-		#if (flash || nme || openfl)
+		#if (flash || nme || (openfl && !heaps_noOpenFl))
 		var p = new Pixels(width, height, haxe.io.Bytes.ofData(bmp.getPixels(bmp.rect)), ARGB);
 		p.flags.set(AlphaPremultiplied);
 		return p;
@@ -660,7 +660,7 @@ class BitmapData {
 		pixels.convert(RGBA);
 		for( i in 0...pixels.width*pixels.height*4 ) img.data[i] = pixels.bytes.get(i);
 		ctx.putImageData(img, 0, 0);
-		#elseif (nme || openfl)
+		#elseif (nme || (openfl && !heaps_noOpenFl))
 		pixels.convert(BGRA);
 		bmp.setPixels(bmp.rect, flash.utils.ByteArray.fromBytes(pixels.bytes));
 		#elseif lime
@@ -683,7 +683,7 @@ class BitmapData {
 	}
 
 	public inline function toNative() : BitmapInnerData {
-		#if (flash || nme || openfl)
+		#if (flash || nme || (openfl && !heaps_noOpenFl))
 		return bmp;
 		#elseif js
 		return ctx;
@@ -694,7 +694,7 @@ class BitmapData {
 
 	public static function fromNative( data : BitmapInnerData ) : BitmapData {
 		var b = new BitmapData( -101, -102 );
-		#if (flash || nme || openfl)
+		#if (flash || nme || (openfl && !heaps_noOpenFl))
 		b.bmp = data;
 		#elseif js
 		b.ctx = data;

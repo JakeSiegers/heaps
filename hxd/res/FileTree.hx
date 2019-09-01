@@ -270,7 +270,7 @@ class FileTree {
 					ret : field.t,
 					expr : { expr : EMeta({ name : ":privateAccess", params : [], pos : pos }, { expr : EReturn(field.e), pos : pos }), pos : pos },
 				}),
-				#if openfl
+				#if (openfl && !heaps_noOpenFl)
 				meta : [ { name:":keep", pos:pos, params:[] } ],
 				#else
 				meta : [ { name:":extern", pos:pos, params:[] } ],
